@@ -18,7 +18,6 @@ def register(request):
     user = User.objects.create_user(username,email,password)
     user.save()
 
-    pass
 
 @csrf_exempt
 def login_validate(request):
