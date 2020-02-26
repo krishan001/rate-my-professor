@@ -1,9 +1,8 @@
-from django.shortcuts import render
-from django.contrib.auth import User, authenticate, login, logout
-from django.http import Http404
-from django.http import *
 import requests
-
+from django.contrib.auth import User, authenticate, login, logout
+from django.http import *
+from django.http import Http404
+from django.shortcuts import render
 
 # Create your views here.
 
@@ -84,4 +83,3 @@ def get_average(request):
 @csrf_exempt
 def post_rating(request):
     pass
-
