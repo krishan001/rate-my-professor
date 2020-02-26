@@ -15,7 +15,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-
+from RateMyProf.views import *
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/register', register),
+    path('api/login', login_validate),
+    path('api/logout', logout_validate),
+    path('api/list', get_list),
+    path('api/view', get_view),
+    path('api/average', get_average),
+    path('api/rating', post_rating),
+
+
+
 ]
