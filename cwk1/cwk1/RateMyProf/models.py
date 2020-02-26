@@ -6,14 +6,14 @@ import datetime
 
 class Prof(models.Model):
     professorName = models.CharField(max_length = 50)
-    professorCode = models.CharField(max_length = 3)
+    professorCode = models.CharField(max_length = 3, unique = True)
 
     def __str__(self):
         return self.professorName
 
 class Module(models.Model):
     moduleTitle = models.CharField(max_length = 50)
-    moduleCode = models.CharField(max_length = 3)
+    moduleCode = models.CharField(max_length = 3, unique = True)
     def __str__(self):
         return self.moduleTitle
 
