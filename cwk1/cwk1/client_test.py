@@ -50,7 +50,7 @@ def login(key):
 def logout(key):
     print("\n")
     if key == "":
-        string = "\n**********************************************************************\nYou are not logged in!!!. \nLog in first!!!!!!\n**********************************************************************\n"
+        string = notLoggedIn()
         key = ""
         return key
     else:
@@ -81,8 +81,8 @@ def lists(key):
             print(string)
     else:
         r = r.json()
-        string = "\n**********************************************************************\nYou are not logged in!!!. \nLog in first!!!!!!\n**********************************************************************\n"
-        print(string)
+        print(notLoggedIn())
+
 
 def rate(key, inp):
     print("\n")
@@ -93,7 +93,7 @@ def rate(key, inp):
         r = r.json()
         print(r["phrase"])
     elif r.status_code == 403:
-        print("\n**********************************************************************\nYou are not logged in!!!. \nLog in first!!!!!!\n**********************************************************************\n")
+        print(notLoggedIn())
     else:
         r = r.json()
         print(r["phrase"])
@@ -113,8 +113,7 @@ def view(key):
             print(string)
     else:
         r = r.json()
-        string = "\n**********************************************************************\nYou are not logged in!!!. \nLog in first!!!!!!\n**********************************************************************\n"
-        print(string)
+        print(notLoggedIn())
 
 def average(key, inp):
     print("\n")
@@ -126,10 +125,13 @@ def average(key, inp):
         string = "\nThe rating of Professor " + r["phrase"]['name'] + " in module " + r["phrase"]['module_n'] + " " + r["phrase"]['modid'] + " is " +  str(r["phrase"]['Rating']) + "\n"
         print(string)
     elif r.status_code == 403:
-        print("\n**********************************************************************\nYou are not logged in!!!. \nLog in first!!!!!!\n**********************************************************************\n")
+        print(notLoggedIn())
     else:
         r = r.json()
         print(r["phrase"])
+
+def notLoggedIn():
+    return ("\n**********************************************************************\nYou are not logged in!!!. \nLog in first!!!!!!\n**********************************************************************\n")
 
 def main(args=None):
     key = ""
