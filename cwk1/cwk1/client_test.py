@@ -4,7 +4,6 @@ import sys
 import re
 
 # Create your tests here.
-
 def register():
     regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
 

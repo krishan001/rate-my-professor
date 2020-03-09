@@ -15,7 +15,6 @@ class Module(models.Model):
     Semesters = [('1',1),('2',2)]
     module_ID = models.CharField('Module ID', max_length=3, default = "")
     name = models.CharField('Module Name', max_length=120, default = "")
-    description = models.TextField(blank=True)
     semester = models.CharField('Semester', max_length=1, choices = Semesters, default = 1)
     year = models.CharField('Year', max_length=4, default = "2020")
     teachers = models.ManyToManyField(Teacher)
