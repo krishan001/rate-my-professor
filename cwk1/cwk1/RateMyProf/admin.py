@@ -1,11 +1,7 @@
 from django.contrib import admin
-from .models import Module, Prof, Student, Rating, ModuleInstance
-# Register your models here.
-# username = admin
-#password = password123
-admin.site.register(Module)
-admin.site.register(Prof)
-admin.site.register(ModuleInstance)
-admin.site.register(Student)
-admin.site.register(Rating)
+from django.contrib.auth import models as md
+from .models import Teacher, Module, Rating
 
+admin.site.register(Teacher)
+admin.site.register(Module)
+admin.site.register(Rating)

@@ -1,104 +1,179 @@
+import json
+import requests
+import sys
+import re
+
+# Create your tests here.
+
+def register():
+    regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
+
+    print("\n")
+    a = input("Enter a username : ")
+    print("\n")
+    b = input("Enter your email : ")
+    print("\n")
+    c = input("Enter a password : ")
+    print("\n")
+    d = input("Confirm password : ")
+    print("\n")
+
+    value1 = re.search(regex,b)
+    value2 = c == d and (len(c)>5)
+    value3 = a.isalnum() and (len(a)>2)
+
+    if ( value1 and value2 and value3):
+        PARAMS = {'uname' : a, 'email' : b, 'passrr' : c}
+        r = requests.post('http://127.0.0.1:8000/api/register/', data = PARAMS )
+        r = r.json()
+        string = r['phrase']
+        print(string)
+    else:
+        print("\n**********************************************************************\n\nSorry!! Invalid values detected. Ensure :\n1) Your username is minimum length 3 and is alpha numeric.\n2) Passwords match and are also minimum length 6.\n3) Your email is valid.\n\n**********************************************************************\n")
+
+def login(key):
+    print("\n")
+    a = input("Enter your username : ")
+    print("\n")
+    b = input("Enter your password : ")
+    print("\n")
+
+    PARAMS = {'uname' : a, 'passrr' : b}
+    r = requests.post('http://127.0.0.1:8000/api/login/', data = PARAMS )
+    r = r.json()
+    string = r['phrase']
+    key = r['token']
+    uname = r['uname']
+    print(string)
+    returnlist = {'key' : key, 'uname' : uname}
+    return returnlist
+
+def logout(key):
+    print("\n")
+    if key == "":
+        string = "\n**********************************************************************\nYou are not logged in!!!. \nLog in first!!!!!!\n**********************************************************************\n"
+        key = ""
+        return key
+    else:
+        headers = {'Authorization': key}
+        r = requests.get('http://127.0.0.1:8000/api/logout/', headers = headers)
+        r = r.json()
+        string = r['phrase']
+        key = r['token']
+        uname = r['uname']
+        print(string)
+        returnlist = {'key' : key, 'uname' : uname}
+        return returnlist
 
 
+def lists(key):
+    print("\n")
+    headers = {'Authorization': key}
+    r = requests.get('http://127.0.0.1:8000/api/list', headers = headers)
+    if r.status_code == 200:
+        r = r.json()
+        li = []
+        print("\n" + "Module ID" + "     " + "Module name" + "     " + "Semester" + "     " + "Year" + "     " + "Teacher ID" +"\n")
+        for i in r['phrase']:
+            li.append(i)
+        x = len(li)
+        for i in range(x):
+            string = "\n" + str(li[i]['ID']) + "     " + str(li[i]['name']) + "     " + str(li[i]['sem']) + "     " + str(li[i]['year']) + "     " + str(li[i]['tc']) +"\n"
+            print(string)
+    else:
+        r = r.json()
+        string = "\n**********************************************************************\nYou are not logged in!!!. \nLog in first!!!!!!\n**********************************************************************\n"
+        print(string)
 
-def register_user(username, password, email):
-    # enter username
-    # enter email
-    # enter password
-    pass
+def rate(key, inp):
+    print("\n")
+    headers = {'Authorization': key}
+    data = {"teach_ID" : inp.split(" ")[1], "mod_ID" : inp.split(" ")[2], "year" : inp.split(" ")[3], "semester" : inp.split(" ")[4], "rate" : inp.split(" ")[5]}
+    r = requests.post('http://127.0.0.1:8000/api/rate/', headers = headers, data = data)
+    if r.status_code == 200:
+        r = r.json()
+        print(r["phrase"])
+    elif r.status_code == 403:
+        print("\n**********************************************************************\nYou are not logged in!!!. \nLog in first!!!!!!\n**********************************************************************\n")
+    else:
+        r = r.json()
+        print(r["phrase"])
 
-def login_user(username, password, url):
-    # enter username
-    # enter password
-    pass
+def view(key):
+    print("\n")
+    headers = {'Authorization': key}
+    r = requests.get('http://127.0.0.1:8000/api/view/', headers = headers)
+    if r.status_code == 200:
+        r = r.json()
+        li = []
+        for i in r['phrase']:
+            li.append(i)
+        x = len(li)
+        for i in range(x):
+            string = "\n" + "The rating of Professor "+ li[i]['name'] +" is " + str(li[i]['Rating']) + "\n"
+            print(string)
+    else:
+        r = r.json()
+        string = "\n**********************************************************************\nYou are not logged in!!!. \nLog in first!!!!!!\n**********************************************************************\n"
+        print(string)
 
-def logout_user():
-    pass
+def average(key, inp):
+    print("\n")
+    headers = {'Authorization': key}
+    data = {"teach_ID" : inp.split(" ")[1], "mod_ID" : inp.split(" ")[2]}
+    r = requests.get('http://127.0.0.1:8000/api/average/', headers = headers, data = data)
+    if r.status_code == 200:
+        r = r.json()
+        string = "\nThe rating of Professor " + r["phrase"]['name'] + " in module " + r["phrase"]['module_n'] + " " + r["phrase"]['modid'] + " is " +  str(r["phrase"]['Rating']) + "\n"
+        print(string)
+    elif r.status_code == 403:
+        print("\n**********************************************************************\nYou are not logged in!!!. \nLog in first!!!!!!\n**********************************************************************\n")
+    else:
+        r = r.json()
+        print(r["phrase"])
 
-def list_items():
-    pass
+def main(args=None):
+    key = ""
+    uname = ""
+    while True:
+        print("\n***********************************************************************************\n")
+        print("\nWelcome to coursework1 of sc17kdp\n")
+        print("Here are your options:\n")
+        print("1) register (Enter it as \"register\")\n")
+        print("2) login (Enter it as \"login\")\n")
+        print("3) list (Enter it as \"list\")\n")
+        print("4) rate (Enter it as \"rate professor_id module_code year semester rating \", where rating is between 1-5)\n")
+        print("5) view (Enter it as \"view\")\n")
+        print("6) average (Enter it as \"average professor_id module_code\")\n")
+        print("7) logout\n")
+        print("8) quit\n")
+        print("\n\n***********************************************************************************\n\n")
+        if len(key) == 0:
+            inp = input("\n\n(not logged in)\nEnter an option : \n\n")
+        else:
+            inp = input("\n\n("+ uname +")\nEnter an option : \n\n")
+        if inp.lower() == "register":
+            register()
+        elif inp.lower() == "login":
+            l = login(key)
+            key = l['key']
+            uname = l['uname']
+        elif inp.lower() == "list":
+            lists(key)
+        elif inp.lower() == "logout":
+            l = logout(key)
+            key = l['key']
+            uname = l['uname']
+        elif inp[0:4].lower() == "rate" and len(inp.split(" ")) == 6 and (inp.split(" ")[3] == "2017" or inp.split(" ")[3] == "2018" or inp.split(" ")[3] == "2019")and (inp.split(" ")[4] == "1" or inp.split(" ")[4] == "2") and (int(inp.split(" ")[5]) >= 1 and int(inp.split(" ")[5])<= 5):
+                rate(key,inp)
+        elif inp.lower() == "view":
+            view(key)
+        elif inp[0:7].lower() == "average" and len(inp.split(" ")) == 3 :
+                average(key,inp)
+        elif inp.lower() == "quit":
+            break
+        else:
+            print("\n***********************************************************************************\nInvalid option\n***********************************************************************************\n")
 
-
-def view():
-    # view the ratings of all the professors
-    pass
-
-def average(professor_id,module_code):
-    # get the average of a certain professor in a certain module
-    pass
-
-def rate(professor_id,module_code, year, semester, rating):
-    # rate the teaching of a certain professor in a certain module instance
-    pass
-
-def client():
-    # infinite loop
-    while 1==1:
-        user_command = input("Please enter a command : ")
-        user_command_split = user_command.split()
-        for i in range (0, len(user_command_split)):
-            user_command_split[i] = user_command_split[i].replace(' ','')
-
-###########################################################################################
-
-        if user_command_split[0] == "register":
-            username = input("Please enter your username : ")
-            email = input("Please enter your email : ")
-            password = input("Please enter your password : ")
-            the_url = user_command_split[1]
-            register_user(username, password, email)
-
-###########################################################################################
-
-        if user_command_split[0] == "login":
-            try:
-                the_url = user_command_split[1]
-                username = input("Please enter your username : ")
-                password = input("Please enter your password : ")
-                login_user(username, password, the_url)
-            except IndexError:
-                print("Please enter a url to login to")
-
-###########################################################################################
-
-        if user_command_split[0] == "logout":
-            logout_user()
-
-###########################################################################################
-
-        if user_command_split[0] == "list":
-            list_items()
-
-###########################################################################################
-
-        if user_command_split[0] == "view":
-            view()
-
-###########################################################################################
-
-        if user_command_split[0] == "average":
-            try:
-                professor_id = user_command_split[1]
-                module_code = user_command_split[2]
-                average(professor_id,module_code)
-            except IndexError:
-                print("Please add a professor id and module code as arguments")
-
-###########################################################################################
-
-        if user_command_split[0] == "rate":
-            try:
-                professor_id = user_command_split[1]
-                module_code = user_command_split[2]
-                year = user_command_split[3]
-                semester = user_command_split[4]
-                rating = user_command_split[5]
-                rate(professor_id,module_code, year, semester, rating)
-                
-            except IndexError:
-                print("Please add professor id, module code, year, semester and rating as arguments")
-                
-
-###########################################################################################
-
-client()
+if __name__ == '__main__':
+    main()
