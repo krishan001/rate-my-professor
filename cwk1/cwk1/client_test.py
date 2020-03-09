@@ -133,7 +133,7 @@ def average(key, inp):
 
 def main(args=None):
     key = ""
-    uname = ""
+    usrname = ""
     while True:
         print("\n***********************************************************************************\n")
         print("\nWelcome to coursework1 of sc17kdp\n")
@@ -150,19 +150,19 @@ def main(args=None):
         if len(key) == 0:
             inp = input("\n\n(not logged in)\nEnter an option : \n\n")
         else:
-            inp = input("\n\n("+ uname +")\nEnter an option : \n\n")
+            inp = input("\n\n("+ usrname +")\nEnter an option : \n\n")
         if inp.lower() == "register":
             register()
         elif inp.lower() == "login":
             l = login(key)
             key = l['key']
-            uname = l['uname']
+            usrname = l['uname']
         elif inp.lower() == "list":
             lists(key)
         elif inp.lower() == "logout":
             l = logout(key)
             key = l['key']
-            uname = l['uname']
+            usrname = l['uname']
         elif inp[0:4].lower() == "rate" and len(inp.split(" ")) == 6 and (inp.split(" ")[3] == "2017" or inp.split(" ")[3] == "2018" or inp.split(" ")[3] == "2019")and (inp.split(" ")[4] == "1" or inp.split(" ")[4] == "2") and (int(inp.split(" ")[5]) >= 1 and int(inp.split(" ")[5])<= 5):
                 rate(key,inp)
         elif inp.lower() == "view":

@@ -28,7 +28,7 @@ class Module(models.Model):
 class Rating(models.Model):
     module = models.ForeignKey(Module,on_delete=models.PROTECT, default = "")
     teacher = models.ForeignKey(Teacher,on_delete=models.PROTECT, default = "")
-    Rating = models.FloatField(default = 0)
+    Rating = models.FloatField(default = 1)
 
     def __str__(self):
         return u'%s,    %s,  Score : %d' % (self.module,self.teacher, self.Rating)
