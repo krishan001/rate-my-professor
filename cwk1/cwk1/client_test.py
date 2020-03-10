@@ -3,7 +3,6 @@ import requests
 import sys
 import re
 
-# Create your tests here.
 def register():
     regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
 
@@ -178,7 +177,7 @@ def main():
 
         elif user_command_split[0].lower() == "quit":
             break
-        
+
         else:
             print("\nInvalid option\n")
         
