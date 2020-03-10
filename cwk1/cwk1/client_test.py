@@ -158,20 +158,27 @@ def main():
             l = login(key)
             key = l['key']
             usrname = l['usrname']
+
         elif user_command_split[0].lower() == "list":
             lists(key)
+
         elif user_command_split[0].lower() == "logout":
             l = logout(key)
             key = l['key']
             usrname = l['usrname']
+
         elif user_command_split[0][0:4].lower() == "rate" and len(user_command_split) == 6:
-                rate(key,inp)
+            rate(key,inp)
+
         elif user_command_split[0].lower() == "view":
             view(key)
+
         elif user_command_split[0].lower() == "average" and len(user_command_split) == 3 :
-                average(key,inp)
+            average(key,inp)
+
         elif user_command_split[0].lower() == "quit":
             break
+        
         else:
             print("\nInvalid option\n")
         
