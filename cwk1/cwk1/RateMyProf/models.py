@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth import models as md
+from django.core.validators import MinValueValidator, MaxValueValidator
+import datetime
+
 
 # Create your models here.
 
@@ -16,7 +19,7 @@ class Module(models.Model):
     module_ID = models.CharField('Module ID', max_length=3, default = "")
     name = models.CharField('Module Name', max_length=120, default = "")
     semester = models.CharField('Semester', max_length=1, choices = Semesters, default = 1)
-    year = models.CharField('Year', max_length=4, default = "2020")
+    year = models.IntegerField(default = datetime.date.today().year, validators = [MinValueValidator(1904), MaxValueValidator(datetime.date.today().year)])
     teachers = models.ManyToManyField(Teacher)
 
     class Meta:

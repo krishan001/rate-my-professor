@@ -26,29 +26,27 @@ def register(request):
         http_bad_response.content = 'Only POST requests are allowed for this resource\n'
         return http_bad_response
 
-    username = request.POST.get('uname')
+    username = request.POST.get('usrname')
     email = request.POST.get('email')
-    password = request.POST.get('passrr')
-    x = True
-    y = True
-    z = User.objects.filter(username = username).count()
-    a = User.objects.filter(email = email).count()
-    if z > 0:
-        x = False
-    if a > 0:
-        y = False
+    password = request.POST.get('pass')
+    uniqueUser = True
 
-    if x == True and y == True:
+    if User.objects.filter(username = username).count() > 0:
+        uniqueUser = False
+    if  User.objects.filter(email = email).count() > 0:
+        uniqueUser = False
+
+    if uniqueUser:
         users = User.objects.create_user(username,email,password)
         users.save()
-        payload  = {'phrase':"\n\n**********************************************************************\n\nRegistration successful!!!\n\n**********************************************************************\n\n"}
+        payload  = {'phrase':"\n\nRegistration successful!!!\n\n"}
         http_response = HttpResponse(json.dumps(payload))
         http_response['Content-Type'] = 'application/json'
         http_response.status_code= 200
         http_response.reason_phrase = 'OK'
         return http_response
     else:
-        payload  = {'phrase':"\n\n**********************************************************************\n\nRegistration Failed!!!\nUsername or email already exists\n\n**********************************************************************\n\n"}
+        payload  = {'phrase':"\n\nRegistration Failed!!!\nUsername or email already exists\n\n"}
         http_response = HttpResponse(json.dumps(payload))
         http_response['Content-Type'] = 'application/json'
         http_response.status_code= 401
@@ -67,20 +65,20 @@ def login(request):
         http_bad_response.content = 'Only POST requests are allowed for this resource\n'
         return http_bad_response
 
-    uname = request.POST.get('uname')
-    password = request.POST.get('passrr')
-    user = authenticate(request, username = uname, password = password)
+    usrname = request.POST.get('usrname')
+    password = request.POST.get('pass')
+    user = authenticate(request, username = usrname, password = password)
     if user is not None:
         auth_login(request, user, user.backend)
         token, _ = Token.objects.get_or_create(user=user)
-        payload  = {'phrase':"\n\n**********************************************************************\n\nYou are now logged in!!!\n\n**********************************************************************\n\n",'token': "Token " + token.key, 'uname': uname}
+        payload  = {'phrase':"\n\nYou are now logged in!!!\n\n",'token': "Token " + token.key, 'usrname': usrname}
         http_response = HttpResponse(json.dumps(payload))
         http_response['Content-Type'] = 'application/json'
         http_response.status_code= 200
         http_response.reason_phrase = 'OK'
         return http_response
     else:
-        payload  = {'phrase':"\n\n**********************************************************************\n\nError. Login Failed. Invalid credentials or User does not exist. Try again or register first!!!\n\n**********************************************************************\n\n", 'token': "", 'uname': ""}
+        payload  = {'phrase':"\n\nError. Login Failed. Invalid credentials or User does not exist. Try again or register first!!!\n\n", 'token': "", 'usrname': ""}
         http_response = HttpResponse(json.dumps(payload))
         http_response['Content-Type'] = 'application/json'
         http_response.status_code= 401
@@ -99,7 +97,7 @@ def logout(request):
         return http_bad_response
 
     token = ""
-    payload  = {'phrase':"\n\n**********************************************************************\n\nYou are now logged out!!!\n\n**********************************************************************\n\n",'token': token, 'uname': ""}
+    payload  = {'phrase':"\n\nYou are now logged out!!!\n\n",'token': token, 'usrname': ""}
     http_response = HttpResponse(json.dumps(payload))
     http_response['Content-Type'] = 'application/json'
     http_response.status_code= 200
@@ -186,7 +184,7 @@ def average(request):
     module = models.Module.objects.filter(module_ID = mid ).count()
 
     if teacher == 0 or module == 0:
-        the_list = "\n\n***********************************************************************************\n\nInvalid option\n\n***********************************************************************************\n\n"
+        the_list = "\n\nInvalid option\n\n"
         payload  = {'phrase':the_list}
         http_response = HttpResponse(json.dumps(payload))
         http_response['Content-Type'] = 'application/json'
@@ -220,7 +218,7 @@ def average(request):
             return http_response
 
         else:
-            the_list = "\n\n***********************************************************************************\n\nTeacher does not take this module.\n\n***********************************************************************************\n\n"
+            the_list = "\n\nTeacher does not take this module.\n\n"
             payload  = {'phrase':the_list}
             http_response = HttpResponse(json.dumps(payload))
             http_response['Content-Type'] = 'application/json'
@@ -252,7 +250,7 @@ def rate(request):
     is_int = isinstance(rate, int)
 
     if teacher == 0 or module == 0 or is_int:
-        the_list = "\n\n***********************************************************************************\n\nInvalid option\n\n***********************************************************************************\n\n"
+        the_list = "\n\nInvalid option\n\n"
         payload  = {'phrase':the_list}
         http_response = HttpResponse(json.dumps(payload))
         http_response['Content-Type'] = 'application/json'
@@ -264,7 +262,7 @@ def rate(request):
         module = models.Module.objects.filter(module_ID = mid )[0]
         mtc = models.Module.objects.filter(module_ID = mid,teachers = teacher.id, year = int(year), semester = int(sem) ).count()
         if mtc > 0:
-            the_list = "\n\n**********************************************************************\nRate successful\n\n**********************************************************************\n"
+            the_list = "\n\nRate successful\n\n"
             payload  = {'phrase':the_list}
             http_response = HttpResponse(json.dumps(payload))
             http_response['Content-Type'] = 'application/json'
@@ -273,7 +271,7 @@ def rate(request):
             rating = models.Rating.objects.create(module = module,teacher = teacher,Rating = rate)
             rating.save()
         else:
-            the_list = "\n\n***********************************************************************************\n\nTeacher does not take this module at specified time.\n\n***********************************************************************************\n\n"
+            the_list = "\n\nTeacher does not take this module at specified time.\n\n"
             payload  = {'phrase':the_list}
             http_response = HttpResponse(json.dumps(payload))
             http_response['Content-Type'] = 'application/json'

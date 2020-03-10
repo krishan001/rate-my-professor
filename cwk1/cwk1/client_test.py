@@ -17,18 +17,14 @@ def register():
     d = input("Confirm password : ")
     print("\n")
 
-    value1 = re.search(regex,b)
-    value2 = c == d and (len(c)>5)
-    value3 = a.isalnum() and (len(a)>2)
-
-    if ( value1 and value2 and value3):
-        PARAMS = {'uname' : a, 'email' : b, 'passrr' : c}
+    if ( re.search(regex,b) and c == d and (len(c)>5) and a.isalnum() and (len(a)>2)):
+        PARAMS = {'usrname' : a, 'email' : b, 'pass' : c}
         r = requests.post('http://127.0.0.1:8000/api/register/', data = PARAMS )
         r = r.json()
         string = r['phrase']
         print(string)
     else:
-        print("\n**********************************************************************\n\nSorry!! Invalid values detected. Ensure :\n1) Your username is minimum length 3 and is alpha numeric.\n2) Passwords match and are also minimum length 6.\n3) Your email is valid.\n\n**********************************************************************\n")
+        print("\n\nSorry!! Invalid values detected. Ensure :\n1) Your username is minimum length 3 and is alpha numeric.\n2) Passwords match and are also minimum length 6.\n3) Your email is valid.\n\n")
 
 def login(key):
     print("\n")
@@ -37,14 +33,14 @@ def login(key):
     b = input("Enter your password : ")
     print("\n")
 
-    PARAMS = {'uname' : a, 'passrr' : b}
+    PARAMS = {'usrname' : a, 'pass' : b}
     r = requests.post('http://127.0.0.1:8000/api/login/', data = PARAMS )
     r = r.json()
     string = r['phrase']
     key = r['token']
-    uname = r['uname']
+    usrname = r['usrname']
     print(string)
-    returnlist = {'key' : key, 'uname' : uname}
+    returnlist = {'key' : key, 'usrname' : usrname}
     return returnlist
 
 def logout(key):
@@ -59,9 +55,9 @@ def logout(key):
         r = r.json()
         string = r['phrase']
         key = r['token']
-        uname = r['uname']
+        usrname = r['usrname']
         print(string)
-        returnlist = {'key' : key, 'uname' : uname}
+        returnlist = {'key' : key, 'usrname' : usrname}
         return returnlist
 
 
@@ -107,8 +103,7 @@ def view(key):
         li = []
         for i in r['phrase']:
             li.append(i)
-        x = len(li)
-        for i in range(x):
+        for i in range(len(li)):
             string = "\n" + "The rating of Professor "+ li[i]['name'] +" is " + str(li[i]['Rating']) + "\n"
             print(string)
     else:
@@ -131,15 +126,14 @@ def average(key, inp):
         print(r["phrase"])
 
 def notLoggedIn():
-    return ("\n**********************************************************************\nYou are not logged in!!!. \nLog in first!!!!!!\n**********************************************************************\n")
+    return ("\nYou are not logged in!!!. \nLog in first!!!!!!\n")
 
-def main(args=None):
+def main():
     key = ""
     usrname = ""
     while True:
         print("\n***********************************************************************************\n")
-        print("\nWelcome to coursework1 of sc17kdp\n")
-        print("Here are your options:\n")
+        print("Please enter a command:\n")
         print("1) register (Enter it as \"register\")\n")
         print("2) login (Enter it as \"login\")\n")
         print("3) list (Enter it as \"list\")\n")
@@ -148,33 +142,40 @@ def main(args=None):
         print("6) average (Enter it as \"average professor_id module_code\")\n")
         print("7) logout\n")
         print("8) quit\n")
-        print("\n\n***********************************************************************************\n\n")
+        print("\n***********************************************************************************\n")
+        
         if len(key) == 0:
             inp = input("\n\n(not logged in)\nEnter an option : \n\n")
         else:
             inp = input("\n\n("+ usrname +")\nEnter an option : \n\n")
-        if inp.lower() == "register":
+
+        
+        user_command_split = inp.split(" ")
+        if user_command_split[0].lower() == "register":
             register()
-        elif inp.lower() == "login":
+        elif user_command_split[0].lower() == "login":
+            # url = user_command_split[1]
             l = login(key)
             key = l['key']
-            usrname = l['uname']
-        elif inp.lower() == "list":
+            usrname = l['usrname']
+        elif user_command_split[0].lower() == "list":
             lists(key)
-        elif inp.lower() == "logout":
+        elif user_command_split[0].lower() == "logout":
             l = logout(key)
             key = l['key']
-            usrname = l['uname']
-        elif inp[0:4].lower() == "rate" and len(inp.split(" ")) == 6 and (inp.split(" ")[3] == "2017" or inp.split(" ")[3] == "2018" or inp.split(" ")[3] == "2019")and (inp.split(" ")[4] == "1" or inp.split(" ")[4] == "2") and (int(inp.split(" ")[5]) >= 1 and int(inp.split(" ")[5])<= 5):
+            usrname = l['usrname']
+        elif user_command_split[0][0:4].lower() == "rate" and len(user_command_split) == 6:
                 rate(key,inp)
-        elif inp.lower() == "view":
+        elif user_command_split[0].lower() == "view":
             view(key)
-        elif inp[0:7].lower() == "average" and len(inp.split(" ")) == 3 :
+        elif user_command_split[0].lower() == "average" and len(user_command_split) == 3 :
                 average(key,inp)
-        elif inp.lower() == "quit":
+        elif user_command_split[0].lower() == "quit":
             break
         else:
-            print("\n***********************************************************************************\nInvalid option\n***********************************************************************************\n")
+            print("\nInvalid option\n")
+        
+
 
 if __name__ == '__main__':
     main()
