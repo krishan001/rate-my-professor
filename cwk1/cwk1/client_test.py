@@ -67,7 +67,7 @@ def lists(key):
     if r.status_code == 200:
         r = r.json()
         li = []
-        print("\n" + "Module ID" + "     " + "Module name" + "     " + "Semester" + "     " + "Year" + "     " + "Professor ID" +"\n")
+        print("\n" + "Module ID" + "     " + "Module name" + "     " + "Semester" + "     " + "Year" + "     " + "Teacher ID" +"\n")
         for i in r['phrase']:
             li.append(i)
         x = len(li)

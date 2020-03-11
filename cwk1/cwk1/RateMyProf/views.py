@@ -53,7 +53,7 @@ def register(request):
         http_response.reason_phrase = 'Invalid Credentials'
         return http_response
 
-# for login
+
 @csrf_exempt
 @api_view(['POST'])
 @permission_classes((AllowAny,))
@@ -116,11 +116,11 @@ def list(request):
         http_bad_response.content = 'Only GET requests are allowed for this resource\n'
         return http_bad_response
 
-    module_list = models.ModuleInstance.objects.all().values('module_ID','name','semester','year','profs')
+    module_list = models.Module.objects.all().values('module_ID','name','semester','year','teachers')
     the_list = []
     for r in module_list:
-        profName = models.Professor.objects.get(id = r['profs'])
-        string = str(profName.profID) + ", " + str(profName.profFirstName)[0]+ "." + str(profName.profLastName)
+        tname = models.Teacher.objects.get(id = r['teachers'])
+        string = str(tname.t_ID) + ", " + str(tname.t_name)[0]+ "." + str(tname.t_last_Name)
         item = {'ID':r['module_ID'],'name': r['name'],'sem': r['semester'], 'year': r['year'],'tc': string}
         the_list.append(item)
     payload  = {'phrase':the_list}
@@ -142,20 +142,20 @@ def view(request):
         http_bad_response.content = 'Only GET requests are allowed for this resource\n'
         return http_bad_response
 
-    profList = models.Professor.objects.all()
+    teacher_list = models.Teacher.objects.all()
     the_list = []
-    for i in profList:
+    for i in teacher_list:
         ratingsum = 0
         ratingaverage = 0
-        trlist = models.Rating.objects.filter(prof = i.id )
-        trcount = models.Rating.objects.filter(prof = i.id ).count()
+        trlist = models.Rating.objects.filter(teacher = i.id )
+        trcount = models.Rating.objects.filter(teacher = i.id ).count()
         for j in trlist:
             ratingsum = ratingsum + j.Rating
         if ratingsum > 0:
             ratingaverage = ratingsum/trcount
         else:
             ratingaverage = 0
-        name = i.profFirstName[0] + "." + i.profLastName
+        name = i.t_name[0] + "." + i.t_last_Name
         item = {'Rating':ratingaverage,'name': name}
         the_list.append(item)
     payload  = {'phrase':the_list}
@@ -177,13 +177,13 @@ def average(request):
         http_bad_response.content = 'Only GET requests are allowed for this resource\n'
         return http_bad_response
 
-    profID = request.POST.get('teach_ID').upper()
-    modID = request.POST.get('mod_ID').upper()
+    tid = request.POST.get('teach_ID').upper()
+    mid = request.POST.get('mod_ID').upper()
 
-    professor = models.Professor.objects.filter(profID = profID).count()
-    module = models.ModuleInstance.objects.filter(module_ID = modID ).count()
+    teacher = models.Teacher.objects.filter(t_ID = tid).count()
+    module = models.Module.objects.filter(module_ID = mid ).count()
 
-    if professor == 0 or module == 0:
+    if teacher == 0 or module == 0:
         the_list = "\n\nInvalid option\n\n"
         payload  = {'phrase':the_list}
         http_response = HttpResponse(json.dumps(payload))
@@ -192,13 +192,13 @@ def average(request):
         http_response.reason_phrase = 'Invalid Details'
         return http_response
     else:
-        module = models.ModuleInstance.objects.filter(module_ID = modID )[0]
-        professor = models.Professor.objects.get(profID = profID)
+        module = models.Module.objects.filter(module_ID = mid )[0]
+        teacher = models.Teacher.objects.get(t_ID = tid)
         ratingsum = 0
         ratingaverage = 0
-        rtm = models.Rating.objects.filter(module = module, prof = professor.id)
-        mtc = models.ModuleInstance.objects.filter(module_ID = modID,profs = professor.id).count()
-        rtmcount = models.Rating.objects.filter(module = module, prof = professor.id).count()
+        rtm = models.Rating.objects.filter(module = module, teacher = teacher.id)
+        mtc = models.Module.objects.filter(module_ID = mid,teachers = teacher.id).count()
+        rtmcount = models.Rating.objects.filter(module = module, teacher = teacher.id).count()
         if mtc > 0:
             for j in rtm:
                 ratingsum = ratingsum + j.Rating
@@ -206,7 +206,7 @@ def average(request):
                 ratingaverage = ratingsum/rtmcount
             else:
                 ratingaverage = 0
-            name = professor.profFirstName[0] + "." + professor.profLastName
+            name = teacher.t_name[0] + "." + teacher.t_last_Name
             modulename = module.name
             modid = module.module_ID
             item = {'Rating':ratingaverage,'name': name, 'module_n': modulename, 'modid' : modid}
@@ -218,7 +218,7 @@ def average(request):
             return http_response
 
         else:
-            the_list = "\n\Professor does not take this module.\n\n"
+            the_list = "\n\nTeacher does not take this module.\n\n"
             payload  = {'phrase':the_list}
             http_response = HttpResponse(json.dumps(payload))
             http_response['Content-Type'] = 'application/json'
@@ -239,17 +239,17 @@ def rate(request):
         http_bad_response.content = 'Only POST requests are allowed for this resource\n'
         return http_bad_response
 
-    profID = request.POST.get('teach_ID').upper()
-    modID = request.POST.get('mod_ID').upper()
+    tid = request.POST.get('teach_ID').upper()
+    mid = request.POST.get('mod_ID').upper()
     year = request.POST.get('year')
     sem = request.POST.get('semester')
     rate = request.POST.get('rate')
 
-    professor = models.Professor.objects.filter(profID = profID).count()
-    module = models.ModuleInstance.objects.filter(module_ID = modID ).count()
+    teacher = models.Teacher.objects.filter(t_ID = tid).count()
+    module = models.Module.objects.filter(module_ID = mid ).count()
     is_int = isinstance(rate, int)
 
-    if professor == 0 or module == 0 or is_int:
+    if teacher == 0 or module == 0 or is_int:
         the_list = "\n\nInvalid option\n\n"
         payload  = {'phrase':the_list}
         http_response = HttpResponse(json.dumps(payload))
@@ -258,9 +258,9 @@ def rate(request):
         http_response.reason_phrase = 'Invalid Details'
         return http_response
     else:
-        professor = models.Professor.objects.get(profID = profID)
-        module = models.ModuleInstance.objects.filter(module_ID = modID )[0]
-        mtc = models.ModuleInstance.objects.filter(module_ID = modID,profs = professor.id, year = int(year), semester = int(sem) ).count()
+        teacher = models.Teacher.objects.get(t_ID = tid)
+        module = models.Module.objects.filter(module_ID = mid )[0]
+        mtc = models.Module.objects.filter(module_ID = mid,teachers = teacher.id, year = int(year), semester = int(sem) ).count()
         if mtc > 0:
             the_list = "\n\nRate successful\n\n"
             payload  = {'phrase':the_list}
@@ -268,10 +268,10 @@ def rate(request):
             http_response['Content-Type'] = 'application/json'
             http_response.status_code= 200
             http_response.reason_phrase = 'OK'
-            rating = models.Rating.objects.create(module = module,prof = professor,Rating = rate)
+            rating = models.Rating.objects.create(module = module,teacher = teacher,Rating = rate)
             rating.save()
         else:
-            the_list = "\n\Professor does not take this module at specified time.\n\n"
+            the_list = "\n\nTeacher does not take this module at specified time.\n\n"
             payload  = {'phrase':the_list}
             http_response = HttpResponse(json.dumps(payload))
             http_response['Content-Type'] = 'application/json'
