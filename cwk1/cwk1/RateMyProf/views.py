@@ -14,6 +14,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from . import models
 import json
+import math
 
 # Create your views here.
 #For registration#
@@ -152,7 +153,7 @@ def view(request):
         for j in trlist:
             ratingsum = ratingsum + j.Rating
         if ratingsum > 0:
-            ratingaverage = ratingsum/trcount
+            ratingaverage = math.trunc((ratingsum/trcount) +0.5)
         else:
             ratingaverage = 0
         name = i.t_name[0] + "." + i.t_last_Name
@@ -203,7 +204,7 @@ def average(request):
             for j in rtm:
                 ratingsum = ratingsum + j.Rating
             if ratingsum > 0:
-                ratingaverage = ratingsum/rtmcount
+                ratingaverage = math.trunc((ratingsum/rtmcount) + 0.5)
             else:
                 ratingaverage = 0
             name = teacher.t_name[0] + "." + teacher.t_last_Name
