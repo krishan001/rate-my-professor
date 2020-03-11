@@ -148,12 +148,16 @@ def main():
         user_command_split = command.split(" ")
         if user_command_split[0].lower() == "register":
             register_user()
-            
+
         elif user_command_split[0].lower() == "login":
-            url = user_command_split[1]
-            l = login_user(key, url)
-            key = l['key']
-            usrname = l['usrname']
+            try:
+                url = user_command_split[1]
+                l = login_user(key, url)
+                key = l['key']
+                usrname = l['usrname']
+                
+            except IndexError:
+                print("Please enter a url to login to")
 
         elif user_command_split[0].lower() == "list":
             lists(key)
