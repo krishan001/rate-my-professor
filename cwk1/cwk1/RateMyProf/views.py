@@ -142,18 +142,18 @@ def view(request):
 
     profList = models.Teacher.objects.all()
     the_list = []
-    for i in profList:
+    for professor in profList:
         rateSum = 0
         avgRate = 0
-        trlist = models.Rating.objects.filter(teacher = i.id )
-        trcount = models.Rating.objects.filter(teacher = i.id ).count()
-        for j in trlist:
-            rateSum = rateSum + j.Rating
+        ratingList = models.Rating.objects.filter(teacher = professor.id )
+        numRatings = models.Rating.objects.filter(teacher = professor.id ).count()
+        for profRate in ratingList:
+            rateSum = rateSum + profRate.Rating
         if rateSum > 0:
-            avgRate = math.trunc((rateSum/trcount) +0.5)
+            avgRate = math.trunc((rateSum/numRatings) + 0.5)
         else:
             avgRate = 0
-        name = i.t_name[0] + "." + i.t_last_Name
+        name = professor.t_name[0] + "." + professor.t_last_Name
         item = {'Rating':avgRate,'name': name}
         the_list.append(item)
     payload  = {'phrase':the_list}
