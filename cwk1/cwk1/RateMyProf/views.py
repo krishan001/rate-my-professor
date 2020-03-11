@@ -20,6 +20,7 @@ import math
 #For registration#
 @csrf_exempt
 def register(request):
+    uniqueUser = True
     http_bad_response = HttpResponseBadRequest()
     http_bad_response['Content-Type'] = 'text/plain'
 
@@ -30,24 +31,22 @@ def register(request):
     username = request.POST.get('usrname')
     email = request.POST.get('email')
     password = request.POST.get('pass')
-    uniqueUser = True
 
-    if User.objects.filter(username = username).count() > 0:
+    if User.objects.filter(username = username).count() > 0 or User.objects.filter(email = email).count() > 0 :
         uniqueUser = False
-    if  User.objects.filter(email = email).count() > 0:
-        uniqueUser = False
+
 
     if uniqueUser:
         users = User.objects.create_user(username,email,password)
         users.save()
-        payload  = {'phrase':"\n\nRegistration successful!!!\n\n"}
+        payload  = {'phrase':"\nSuceessfully Registered!!!\n"}
         http_response = HttpResponse(json.dumps(payload))
         http_response['Content-Type'] = 'application/json'
         http_response.status_code= 200
         http_response.reason_phrase = 'OK'
         return http_response
     else:
-        payload  = {'phrase':"\n\nRegistration Failed!!!\nUsername or email already exists\n\n"}
+        payload  = {'phrase':"\nRegistration Failed!!!\nUsername or email already exists\n\n"}
         http_response = HttpResponse(json.dumps(payload))
         http_response['Content-Type'] = 'application/json'
         http_response.status_code= 401
@@ -63,7 +62,7 @@ def login(request):
     http_bad_response['Content-Type'] = 'text/plain'
 
     if(request.method == 'GET'):
-        http_bad_response.content = 'Only POST requests are allowed for this resource\n'
+        http_bad_response.content = 'Only POST requests are valid\n'
         return http_bad_response
 
     usrname = request.POST.get('usrname')
@@ -72,14 +71,14 @@ def login(request):
     if user is not None:
         auth_login(request, user, user.backend)
         token, _ = Token.objects.get_or_create(user=user)
-        payload  = {'phrase':"\n\nYou are now logged in!!!\n\n",'token': "Token " + token.key, 'usrname': usrname}
+        payload  = {'phrase':"\nCongrat's! You are logged in!\n",'token': "Token " + token.key, 'usrname': usrname}
         http_response = HttpResponse(json.dumps(payload))
         http_response['Content-Type'] = 'application/json'
         http_response.status_code= 200
         http_response.reason_phrase = 'OK'
         return http_response
     else:
-        payload  = {'phrase':"\n\nError. Login Failed. Invalid credentials or User does not exist. Try again or register first!!!\n\n", 'token': "", 'usrname': ""}
+        payload  = {'phrase':"\n\nError. Login Failed. Invalid credentials. Try again or register first!!!\n\n", 'token': "", 'usrname': ""}
         http_response = HttpResponse(json.dumps(payload))
         http_response['Content-Type'] = 'application/json'
         http_response.status_code= 401
@@ -92,7 +91,7 @@ def logout(request):
     http_bad_response['Content-Type'] = 'text/plain'
 
     if(request.method != 'GET'):
-        http_bad_response.content = 'Only GET requests are allowed for this resource\n'
+        http_bad_response.content = 'Only GET requests are valid\n'
         return http_bad_response
 
     token = ""
@@ -112,14 +111,14 @@ def list(request):
     http_bad_response['Content-Type'] = 'text/plain'
 
     if(request.method != 'GET'):
-        http_bad_response.content = 'Only GET requests are allowed for this resource\n'
+        http_bad_response.content = 'Only GET requests are valid\n'
         return http_bad_response
 
     module_list = models.Module.objects.all().values('module_ID','name','semester','year','teachers')
     the_list = []
     for r in module_list:
-        tname = models.Teacher.objects.get(id = r['teachers'])
-        string = str(tname.t_ID) + ", " + str(tname.t_name)[0]+ "." + str(tname.t_last_Name)
+        profName = models.Teacher.objects.get(id = r['teachers'])
+        string = str(profName.t_ID) + ", " + str(profName.t_name)[0]+ "." + str(profName.t_last_Name)
         item = {'ID':r['module_ID'],'name': r['name'],'sem': r['semester'], 'year': r['year'],'tc': string}
         the_list.append(item)
     payload  = {'phrase':the_list}
@@ -138,7 +137,7 @@ def view(request):
     http_bad_response['Content-Type'] = 'text/plain'
 
     if(request.method != 'GET'):
-        http_bad_response.content = 'Only GET requests are allowed for this resource\n'
+        http_bad_response.content = 'Only GET requests are valid\n'
         return http_bad_response
 
     profList = models.Teacher.objects.all()
