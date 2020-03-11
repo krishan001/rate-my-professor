@@ -86,8 +86,6 @@ def login(request):
         http_response.reason_phrase = 'Invalid credentials'
         return http_response
 
-
-
 #For logout
 def logout(request):
     http_bad_response = HttpResponseBadRequest()
