@@ -141,21 +141,21 @@ def view(request):
         http_bad_response.content = 'Only GET requests are allowed for this resource\n'
         return http_bad_response
 
-    teacher_list = models.Teacher.objects.all()
+    profList = models.Teacher.objects.all()
     the_list = []
-    for i in teacher_list:
-        ratingsum = 0
-        ratingaverage = 0
+    for i in profList:
+        rateSum = 0
+        avgRate = 0
         trlist = models.Rating.objects.filter(teacher = i.id )
         trcount = models.Rating.objects.filter(teacher = i.id ).count()
         for j in trlist:
-            ratingsum = ratingsum + j.Rating
-        if ratingsum > 0:
-            ratingaverage = math.trunc((ratingsum/trcount) +0.5)
+            rateSum = rateSum + j.Rating
+        if rateSum > 0:
+            avgRate = math.trunc((rateSum/trcount) +0.5)
         else:
-            ratingaverage = 0
+            avgRate = 0
         name = i.t_name[0] + "." + i.t_last_Name
-        item = {'Rating':ratingaverage,'name': name}
+        item = {'Rating':avgRate,'name': name}
         the_list.append(item)
     payload  = {'phrase':the_list}
     http_response = HttpResponse(json.dumps(payload))
@@ -176,11 +176,11 @@ def average(request):
         http_bad_response.content = 'Only GET requests are allowed for this resource\n'
         return http_bad_response
 
-    tid = request.POST.get('teach_ID').upper()
-    mid = request.POST.get('mod_ID').upper()
+    profID = request.POST.get('teach_ID').upper()
+    moduleID = request.POST.get('mod_ID').upper()
 
-    teacher = models.Teacher.objects.filter(t_ID = tid).count()
-    module = models.Module.objects.filter(module_ID = mid ).count()
+    teacher = models.Teacher.objects.filter(t_ID = profID).count()
+    module = models.Module.objects.filter(module_ID = moduleID ).count()
 
     if teacher == 0 or module == 0:
         the_list = "\n\nInvalid option\n\n"
@@ -191,24 +191,24 @@ def average(request):
         http_response.reason_phrase = 'Invalid Details'
         return http_response
     else:
-        module = models.Module.objects.filter(module_ID = mid )[0]
-        teacher = models.Teacher.objects.get(t_ID = tid)
-        ratingsum = 0
-        ratingaverage = 0
-        rtm = models.Rating.objects.filter(module = module, teacher = teacher.id)
-        mtc = models.Module.objects.filter(module_ID = mid,teachers = teacher.id).count()
-        rtmcount = models.Rating.objects.filter(module = module, teacher = teacher.id).count()
-        if mtc > 0:
-            for j in rtm:
-                ratingsum = ratingsum + j.Rating
-            if ratingsum > 0:
-                ratingaverage = math.trunc((ratingsum/rtmcount) + 0.5)
+        module = models.Module.objects.filter(module_ID = moduleID )[0]
+        teacher = models.Teacher.objects.get(t_ID = profID)
+        rateSum = 0
+        avgRate = 0
+        rate = models.Rating.objects.filter(module = module, teacher = teacher.id)
+        numModule = models.Module.objects.filter(module_ID = moduleID,teachers = teacher.id).count()
+        numRating = models.Rating.objects.filter(module = module, teacher = teacher.id).count()
+        if numModule > 0:
+            for j in rate:
+                rateSum = rateSum + j.Rating
+            if rateSum > 0:
+                avgRate = math.trunc((rateSum/numRating) + 0.5)
             else:
-                ratingaverage = 0
+                avgRate = 0
             name = teacher.t_name[0] + "." + teacher.t_last_Name
             modulename = module.name
             modid = module.module_ID
-            item = {'Rating':ratingaverage,'name': name, 'module_n': modulename, 'modid' : modid}
+            item = {'Rating':avgRate,'name': name, 'module_n': modulename, 'modid' : modid}
             payload  = {'phrase':item}
             http_response = HttpResponse(json.dumps(payload))
             http_response['Content-Type'] = 'application/json'
@@ -238,17 +238,17 @@ def rate(request):
         http_bad_response.content = 'Only POST requests are allowed for this resource\n'
         return http_bad_response
 
-    tid = request.POST.get('teach_ID').upper()
-    mid = request.POST.get('mod_ID').upper()
+    profID = request.POST.get('teach_ID').upper()
+    modID = request.POST.get('mod_ID').upper()
     year = request.POST.get('year')
     sem = request.POST.get('semester')
     rate = request.POST.get('rate')
 
-    teacher = models.Teacher.objects.filter(t_ID = tid).count()
-    module = models.Module.objects.filter(module_ID = mid ).count()
+    numProf = models.Teacher.objects.filter(t_ID = profID).count()
+    numModule = models.Module.objects.filter(module_ID = modID ).count()
     is_int = isinstance(rate, int)
 
-    if teacher == 0 or module == 0 or is_int:
+    if numProf == 0 or numModule == 0 or is_int:
         the_list = "\n\nInvalid option\n\n"
         payload  = {'phrase':the_list}
         http_response = HttpResponse(json.dumps(payload))
@@ -257,17 +257,17 @@ def rate(request):
         http_response.reason_phrase = 'Invalid Details'
         return http_response
     else:
-        teacher = models.Teacher.objects.get(t_ID = tid)
-        module = models.Module.objects.filter(module_ID = mid )[0]
-        mtc = models.Module.objects.filter(module_ID = mid,teachers = teacher.id, year = int(year), semester = int(sem) ).count()
-        if mtc > 0:
+        prof = models.Teacher.objects.get(t_ID = profID)
+        module = models.Module.objects.filter(module_ID = modID )[0]
+        numModules = models.Module.objects.filter(module_ID = modID,teachers = prof.id, year = int(year), semester = int(sem) ).count()
+        if numModules > 0:
             the_list = "\n\nRate successful\n\n"
             payload  = {'phrase':the_list}
             http_response = HttpResponse(json.dumps(payload))
             http_response['Content-Type'] = 'application/json'
             http_response.status_code= 200
             http_response.reason_phrase = 'OK'
-            rating = models.Rating.objects.create(module = module,teacher = teacher,Rating = rate)
+            rating = models.Rating.objects.create(module = module,teacher = prof,Rating = rate)
             rating.save()
         else:
             the_list = "\n\nTeacher does not take this module at specified time.\n\n"
