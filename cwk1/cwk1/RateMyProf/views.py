@@ -1,10 +1,3 @@
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.authtoken.models import Token
-from rest_framework.status import HTTP_400_BAD_REQUEST
-from rest_framework.response import Response
-from rest_framework.reverse import reverse
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
@@ -12,6 +5,13 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.authtoken.models import Token
+from rest_framework.status import HTTP_400_BAD_REQUEST
+from rest_framework.response import Response
+from rest_framework.reverse import reverse
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from . import models
 import json
 import math
