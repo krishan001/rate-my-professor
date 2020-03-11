@@ -120,7 +120,7 @@ def list(request):
     the_list = []
     for r in module_list:
         profName = models.Professor.objects.get(id = r['profs'])
-        string = str(profName.t_ID) + ", " + str(profName.t_name)[0]+ "." + str(profName.t_last_Name)
+        string = str(profName.profID) + ", " + str(profName.profFirstName)[0]+ "." + str(profName.profLastName)
         item = {'ID':r['module_ID'],'name': r['name'],'sem': r['semester'], 'year': r['year'],'tc': string}
         the_list.append(item)
     payload  = {'phrase':the_list}
@@ -155,7 +155,7 @@ def view(request):
             ratingaverage = ratingsum/trcount
         else:
             ratingaverage = 0
-        name = i.t_name[0] + "." + i.t_last_Name
+        name = i.profFirstName[0] + "." + i.profLastName
         item = {'Rating':ratingaverage,'name': name}
         the_list.append(item)
     payload  = {'phrase':the_list}
@@ -180,7 +180,7 @@ def average(request):
     profID = request.POST.get('teach_ID').upper()
     modID = request.POST.get('mod_ID').upper()
 
-    professor = models.Professor.objects.filter(t_ID = profID).count()
+    professor = models.Professor.objects.filter(profID = profID).count()
     module = models.ModuleInstance.objects.filter(module_ID = modID ).count()
 
     if professor == 0 or module == 0:
@@ -193,7 +193,7 @@ def average(request):
         return http_response
     else:
         module = models.ModuleInstance.objects.filter(module_ID = modID )[0]
-        professor = models.Professor.objects.get(t_ID = profID)
+        professor = models.Professor.objects.get(profID = profID)
         ratingsum = 0
         ratingaverage = 0
         rtm = models.Rating.objects.filter(module = module, prof = professor.id)
@@ -206,7 +206,7 @@ def average(request):
                 ratingaverage = ratingsum/rtmcount
             else:
                 ratingaverage = 0
-            name = professor.t_name[0] + "." + professor.t_last_Name
+            name = professor.profFirstName[0] + "." + professor.profLastName
             modulename = module.name
             modid = module.module_ID
             item = {'Rating':ratingaverage,'name': name, 'module_n': modulename, 'modid' : modid}
@@ -245,7 +245,7 @@ def rate(request):
     sem = request.POST.get('semester')
     rate = request.POST.get('rate')
 
-    professor = models.Professor.objects.filter(t_ID = profID).count()
+    professor = models.Professor.objects.filter(profID = profID).count()
     module = models.ModuleInstance.objects.filter(module_ID = modID ).count()
     is_int = isinstance(rate, int)
 
@@ -258,7 +258,7 @@ def rate(request):
         http_response.reason_phrase = 'Invalid Details'
         return http_response
     else:
-        professor = models.Professor.objects.get(t_ID = profID)
+        professor = models.Professor.objects.get(profID = profID)
         module = models.ModuleInstance.objects.filter(module_ID = modID )[0]
         mtc = models.ModuleInstance.objects.filter(module_ID = modID,profs = professor.id, year = int(year), semester = int(sem) ).count()
         if mtc > 0:

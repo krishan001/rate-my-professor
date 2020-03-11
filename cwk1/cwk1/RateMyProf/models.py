@@ -7,12 +7,12 @@ import datetime
 # Create your models here.
 
 class Professor(models.Model):
-    t_ID = models.CharField('Professor ID', max_length=3, unique= True)
-    t_name = models.CharField('Professor First Name', max_length=120)
-    t_last_Name = models.CharField('Professor Last Name', max_length=120)
+    profID = models.CharField('Professor ID', max_length=3, unique= True)
+    profFirstName = models.CharField('Professor First Name', max_length=120)
+    profLastName = models.CharField('Professor Last Name', max_length=120)
 
     def __str__(self):
-        return u'%s %s' % (self.t_name, self.t_last_Name)
+        return u'%s %s' % (self.profFirstName, self.profLastName)
 
 class ModuleInstance(models.Model):
     Semesters = [('1',1),('2',2)]
