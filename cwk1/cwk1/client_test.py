@@ -7,17 +7,17 @@ def register():
     regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
 
     print("\n")
-    a = input("Enter a username : ")
+    username = input("Enter a username : ")
     print("\n")
-    b = input("Enter your email : ")
+    email = input("Enter your email : ")
     print("\n")
-    c = input("Enter a password : ")
+    pswd = input("Enter a password : ")
     print("\n")
-    d = input("Confirm password : ")
+    conPswd = input("Confirm password : ")
     print("\n")
 
-    if ( re.search(regex,b) and c == d and (len(c)>5) and a.isalnum() and (len(a)>2)):
-        PARAMS = {'usrname' : a, 'email' : b, 'pass' : c}
+    if ( re.search(regex,email) and pswd == conPswd and (len(pswd)>5) and username.isalnum() and (len(username)>2)):
+        PARAMS = {'usrname' : username, 'email' : email, 'pass' : pswd}
         r = requests.post('http://127.0.0.1:8000/api/register/', data = PARAMS )
         r = r.json()
         string = r['phrase']
@@ -27,41 +27,39 @@ def register():
 
 def login(key):
     print("\n")
-    a = input("Enter your username : ")
+    username = input("Enter your username : ")
     print("\n")
-    b = input("Enter your password : ")
+    pswd = input("Enter your password : ")
     print("\n")
 
-    PARAMS = {'usrname' : a, 'pass' : b}
+    PARAMS = {'usrname' : username, 'pass' : pswd}
     r = requests.post('http://127.0.0.1:8000/api/login/', data = PARAMS )
     r = r.json()
-    string = r['phrase']
+    phrase = r['phrase']
     key = r['token']
     usrname = r['usrname']
-    print(string)
+    print(phrase)
     returnlist = {'key' : key, 'usrname' : usrname}
     return returnlist
 
 def logout(key):
-    print("\n")
     if key == "":
-        string = notLoggedIn()
+        phrase = notLoggedIn()
         key = ""
         return key
     else:
         headers = {'Authorization': key}
         r = requests.get('http://127.0.0.1:8000/api/logout/', headers = headers)
         r = r.json()
-        string = r['phrase']
+        phrase = r['phrase']
         key = r['token']
         usrname = r['usrname']
-        print(string)
+        print(phrase)
         returnlist = {'key' : key, 'usrname' : usrname}
         return returnlist
 
 
 def lists(key):
-    print("\n")
     headers = {'Authorization': key}
     r = requests.get('http://127.0.0.1:8000/api/list', headers = headers)
     if r.status_code == 200:
@@ -72,15 +70,14 @@ def lists(key):
             li.append(i)
         x = len(li)
         for i in range(x):
-            string = "\n" + str(li[i]['ID']) + "     " + str(li[i]['name']) + "     " + str(li[i]['sem']) + "     " + str(li[i]['year']) + "     " + str(li[i]['tc']) +"\n"
-            print(string)
+            phrase = "\n" + str(li[i]['ID']) + "     " + str(li[i]['name']) + "     " + str(li[i]['sem']) + "     " + str(li[i]['year']) + "     " + str(li[i]['tc']) +"\n"
+            print(phrase)
     else:
         r = r.json()
         print(notLoggedIn())
 
 
 def rate(key, command):
-    print("\n")
     headers = {'Authorization': key}
     data = {"teach_ID" : command.split(" ")[1], "mod_ID" : command.split(" ")[2], "year" : command.split(" ")[3], "semester" : command.split(" ")[4], "rate" : command.split(" ")[5]}
     r = requests.post('http://127.0.0.1:8000/api/rate/', headers = headers, data = data)
@@ -94,7 +91,6 @@ def rate(key, command):
         print(r["phrase"])
 
 def view(key):
-    print("\n")
     headers = {'Authorization': key}
     r = requests.get('http://127.0.0.1:8000/api/view/', headers = headers)
     if r.status_code == 200:
@@ -109,15 +105,15 @@ def view(key):
         r = r.json()
         print(notLoggedIn())
 
-def average(key, inp):
+def average(key, command):
     print("\n")
     headers = {'Authorization': key}
-    data = {"teach_ID" : inp.split(" ")[1], "mod_ID" : inp.split(" ")[2]}
+    data = {"teach_ID" : command.split(" ")[1], "mod_ID" : command.split(" ")[2]}
     r = requests.get('http://127.0.0.1:8000/api/average/', headers = headers, data = data)
     if r.status_code == 200:
         r = r.json()
-        string = "\nThe rating of Professor " + r["phrase"]['name'] + " in module " + r["phrase"]['module_n'] + " " + r["phrase"]['modid'] + " is " +  str(r["phrase"]['Rating']) + "\n"
-        print(string)
+        phrase = "\nThe rating of Professor " + r["phrase"]['name'] + " in module " + r["phrase"]['module_n'] + " " + r["phrase"]['modid'] + " is " +  str(r["phrase"]['Rating']) + "\n"
+        print(phrase)
     elif r.status_code == 403:
         print(notLoggedIn())
     else:
@@ -131,6 +127,7 @@ def main():
     key = ""
     usrname = ""
     while True:
+        print("=======================================================================================================")
         print("Please enter a command:\n")
         print("1) register (Enter it as \"register\")\n")
         print("2) login (Enter it as \"login\")\n")
