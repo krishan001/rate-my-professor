@@ -23,7 +23,7 @@ def register():
         string = r['phrase']
         print(string)
     else:
-        print("\n\nSorry!! Invalid values detected. Ensure :\n1) Your username is minimum length 3 and is alpha numeric.\n2) Passwords match and are also minimum length 6.\n3) Your email is valid.\n\n")
+        print("\nSorry!! Invalid values detected. Ensure :\n1) Your username is minimum length 3 and is alpha numeric.\n2) Passwords match and are also minimum length 6.\n3) Your email is valid.\n")
 
 def login(key):
     print("\n")
@@ -79,10 +79,10 @@ def lists(key):
         print(notLoggedIn())
 
 
-def rate(key, inp):
+def rate(key, command):
     print("\n")
     headers = {'Authorization': key}
-    data = {"teach_ID" : inp.split(" ")[1], "mod_ID" : inp.split(" ")[2], "year" : inp.split(" ")[3], "semester" : inp.split(" ")[4], "rate" : inp.split(" ")[5]}
+    data = {"teach_ID" : command.split(" ")[1], "mod_ID" : command.split(" ")[2], "year" : command.split(" ")[3], "semester" : command.split(" ")[4], "rate" : command.split(" ")[5]}
     r = requests.post('http://127.0.0.1:8000/api/rate/', headers = headers, data = data)
     if r.status_code == 200:
         r = r.json()
@@ -131,7 +131,6 @@ def main():
     key = ""
     usrname = ""
     while True:
-        print("\n***********************************************************************************\n")
         print("Please enter a command:\n")
         print("1) register (Enter it as \"register\")\n")
         print("2) login (Enter it as \"login\")\n")
@@ -141,15 +140,14 @@ def main():
         print("6) average (Enter it as \"average professor_id module_code\")\n")
         print("7) logout\n")
         print("8) quit\n")
-        print("\n***********************************************************************************\n")
         
         if len(key) == 0:
-            inp = input("\n\n(not logged in)\nEnter an option : \n\n")
+            command = input("\n(not logged in)\nEnter an option : ")
         else:
-            inp = input("\n\n("+ usrname +")\nEnter an option : \n\n")
+            command = input("\n("+ usrname +")\nEnter an option : ")
 
         
-        user_command_split = inp.split(" ")
+        user_command_split = command.split(" ")
         if user_command_split[0].lower() == "register":
             register()
         elif user_command_split[0].lower() == "login":
@@ -167,13 +165,13 @@ def main():
             usrname = l['usrname']
 
         elif user_command_split[0][0:4].lower() == "rate" and len(user_command_split) == 6:
-            rate(key,inp)
+            rate(key,command)
 
         elif user_command_split[0].lower() == "view":
             view(key)
 
         elif user_command_split[0].lower() == "average" and len(user_command_split) == 3 :
-            average(key,inp)
+            average(key,command)
 
         elif user_command_split[0].lower() == "quit":
             break
