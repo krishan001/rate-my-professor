@@ -25,7 +25,7 @@ def register_user():
     else:
         print("\nSorry!! Invalid values detected. Ensure :\n1) Your username is minimum length 3 and is alpha numeric.\n2) Passwords match and are also minimum length 6.\n3) Your email is valid.\n")
 
-def login_user(key, url):
+def login_user(key):
     print("\n")
     username = input("Enter your username : ")
     print("\n")
@@ -33,8 +33,8 @@ def login_user(key, url):
     print("\n")
 
     PARAMS = {'usrname' : username, 'pass' : pswd}
-    # r = requests.post('http://127.0.0.1:8000/api/login/', data = PARAMS )
-    req = requests.post(url, data = PARAMS )
+    req = requests.post('http://sc17kdp.pythonanywhere.com/api/login/', data = PARAMS )
+    # req = requests.post(url, data = PARAMS )
     req = req.json()
     phrase = req['phrase']
     key = req['token']
@@ -131,7 +131,7 @@ def main():
         print("=======================================================================================================")
         print("Please enter a command:\n")
         print("1) register\n")
-        print("2) login (Enter it as \"login url\")\n")
+        print("2) login (Enter it as \"login\")\n")
         print("3) list \n")
         print("4) rate (Enter it as \"rate professor_id module_code year semester rating \", where rating is between 1-5)\n")
         print("5) view \n")
@@ -151,8 +151,8 @@ def main():
 
         elif user_command_split[0].lower() == "login":
             try:
-                url = user_command_split[1]
-                l = login_user(key, url)
+                # url = user_command_split[1]
+                l = login_user(key)
                 key = l['key']
                 usrname = l['usrname']
                 
