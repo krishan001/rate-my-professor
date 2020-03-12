@@ -18,7 +18,7 @@ def register_user():
 
     if ( re.search(regex,email) and pswd == conPswd and (len(pswd)>5) and username.isalnum() and (len(username)>2)):
         PARAMS = {'usrname' : username, 'email' : email, 'pass' : pswd}
-        req = requests.post('http://127.0.0.1:8000/api/register/', data = PARAMS )
+        req = requests.post('http://sc17kdp.pythonanywhere.com/api/register/', data = PARAMS )
         req = req.json()
         string = req['phrase']
         print(string)
@@ -50,7 +50,7 @@ def logout_user(key):
         return key
     else:
         headers = {'Authorization': key}
-        req = requests.get('http://127.0.0.1:8000/api/logout/', headers = headers)
+        req = requests.get('http://sc17kdp.pythonanywhere.com/api/logout/', headers = headers)
         req = req.json()
         phrase = req['phrase']
         key = req['token']
@@ -62,7 +62,7 @@ def logout_user(key):
 
 def lists(key):
     headers = {'Authorization': key}
-    req = requests.get('http://127.0.0.1:8000/api/list', headers = headers)
+    req = requests.get('http://sc17kdp.pythonanywhere.com/api/list', headers = headers)
     if req.status_code == 200:
         req = req.json()
         li = []
@@ -81,7 +81,7 @@ def lists(key):
 def rate(key, command):
     headers = {'Authorization': key}
     data = {"teach_ID" : command.split(" ")[1], "mod_ID" : command.split(" ")[2], "year" : command.split(" ")[3], "semester" : command.split(" ")[4], "rate" : command.split(" ")[5]}
-    req = requests.post('http://127.0.0.1:8000/api/rate/', headers = headers, data = data)
+    req = requests.post('http://sc17kdp.pythonanywhere.com/api/rate/', headers = headers, data = data)
     if req.status_code == 200:
         req = req.json()
         print(req["phrase"])
@@ -93,7 +93,7 @@ def rate(key, command):
 
 def view(key):
     headers = {'Authorization': key}
-    req = requests.get('http://127.0.0.1:8000/api/view/', headers = headers)
+    req = requests.get('http://sc17kdp.pythonanywhere.com/api/view/', headers = headers)
     if req.status_code == 200:
         req = req.json()
         li = []
@@ -110,7 +110,7 @@ def average(key, command):
     print("\n")
     headers = {'Authorization': key}
     data = {"teach_ID" : command.split(" ")[1], "mod_ID" : command.split(" ")[2]}
-    req = requests.get('http://127.0.0.1:8000/api/average/', headers = headers, data = data)
+    req = requests.get('http://sc17kdp.pythonanywhere.com/api/average/', headers = headers, data = data)
     if req.status_code == 200:
         req = req.json()
         phrase = "\nThe rating of Professor " + req["phrase"]['name'] + " in module " + req["phrase"]['module_n'] + " " + req["phrase"]['modid'] + " is " +  str(req["phrase"]['Rating']) + "\n"
